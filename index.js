@@ -12,16 +12,32 @@ mongoose
   .connect(MONGODB_URI, {
     useCreateIndex: true,
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
   })
-  .then(self => {
+  .then((self) => {
     console.log(`Connected to the database: "${self.connection.name}"`);
-    // Before adding any recipes to the database, let's remove all existing ones
-    return Recipe.deleteMany()
+    return Recipe.deleteMany();
   })
   .then(() => {
-    // Run your code here, after you have insured that the connection was made
+    // return Recipe.create(data[0]);
+    return Recipe.insertMany(data);
   })
-  .catch(error => {
+  .then(() => {
+    return Recipe.findOneAndUpdate(
+      { title: 'Rigatoni alla Genovese' },
+      { duration: 100 }
+    );
+  })
+  .then((data) => {
+    console.log(`Database Updated ${data.title}`);
+    return Recipe.findOneAndDelete({ title: 'Carrot Cake' });
+  })
+  .then(() => {
+    mongoose.connection.close();
+  })
+  .then(() => {
+    console.log('connection closed');
+  })
+  .catch((error) => {
     console.error('Error connecting to the database', error);
   });
